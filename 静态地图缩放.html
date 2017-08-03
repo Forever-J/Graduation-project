@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ 
+     <title>My fisrt ArcGis Map</title>
+     <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css"/>
+     <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+     <!--<script type="text/javascript" src="arcgisjs/jsapi_vsdoc12_v38.js"></script>-->
+     <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+    <script>
+        dojo.require("esri.map");
+        var myMap;
+        function init()
+        {
+            myMap = new esri.Map("map1");
+            var layer1 = new esri.layers.ArcGISTiledMapServiceLayer("http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer");
+            myMap.addLayer(layer1);
+            myMap.setZoom(4);
+        }
+        dojo.addOnLoad(init);
+    </script>
+</head>
+<body>
+    <div id="map1" style=" width:900px; height:800px"></div>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Update Fire Perimeter</title>
+    
+   <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/dojo/dijit/themes/claro/claro.css" />
+    <script type="text/javascript" src="http://localhost:3616/arcgisjs/init.js"></script>
+    <script type="text/javascript" src="arcgisjs/jsapi_vsdoc12_v38.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/esri/css/esri.css" />
+    <style>
+      html, body { height: 100%; width: 100%; margin: 0;}
+      #map, #header {
+        border: 1px solid #444;
+      }
+      #map {
+        padding: 0;
+        margin: 5px;
+      }
+      #header {
+        height: 45px;
+        margin: 5px 5px 0 5px;
+        padding: 0.5em;
+        font-family: sans-serif;
+        font-weight: 500;
+        color: #0f3b5f;
+        font-size: 1.1em;
+      }
+      .dj_ie .infowindow .window .top .right .user .content { position: relative; }
+      .dj_ie .simpleInfoWindow .content {position: relative;}
+    </style>
+
+    <script>
+        var map;
+        require([
+          "esri/map",
+          "esri/toolbars/edit",
+          "esri/layers/FeatureLayer",
+          "esri/config",
+
+          "dojo/_base/event",
+          "dojo/parser",
+
+          "dijit/layout/BorderContainer", "dijit/layout/ContentPane",
+          "dojo/domReady!"
+        ], function (
+          Map, Edit, FeatureLayer, esriConfig,
+          event, parser
+        ) {
+            parser.parse();
+
+            // refer to "Using the Proxy Page" for more information:  https://developers.arcgis.com/javascript/jshelp/ags_proxy.html
+            esriConfig.defaults.io.proxyUrl = "/proxy/";
+
+            map = new Map("map", {
+                basemap: "topo",
+                center: [-117.72, 34.352],
+                zoom: 11
+            });
+
+            map.on("layers-add-result", initEditing);
+
+            var firePerimeterFL = new FeatureLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Wildfire/FeatureServer/2", {
+                mode: FeatureLayer.MODE_ONDEMAND,
+                outFields: ["*"],
+                id: "firePerimeterFL"
+            });
+            map.addLayers([firePerimeterFL]);
+
+            function initEditing(evt) {
+                var firePerimeterFL = map.getLayer("firePerimeterFL");
+
+                var editToolbar = new Edit(map);
+                editToolbar.on("deactivate", function (evt) {
+                    if (evt.info.isModified) {
+                        firePerimeterFL.applyEdits(null, [evt.graphic], null);//应用编辑FeatureLayer，参数添加，更新，删除
+                    }
+                });
+
+                var editingEnabled = false;
+                firePerimeterFL.on("dbl-click", function (evt) {
+                    event.stop(evt);
+                    if (editingEnabled === false) {
+                        editingEnabled = true;
+                        editToolbar.activate(Edit.EDIT_VERTICES, evt.graphic);//编辑多条线段，添加、删除、移动
+                    } else {
+                        editToolbar.deactivate();
+                        editingEnabled = false;
+                    }
+                });
+            }
+        });
+    </script>
+  </head>
+  <body class="claro"> 
+    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline'" style="width:100%;height:100%;"  gutters="false">
+      <div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'" >
+         <center> 放大和双击顶点编辑，再次双击结束编辑</center>
+      </div>
+      <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"> </div>
+    </div>
+ 
+  </body>
+</html>
+ 

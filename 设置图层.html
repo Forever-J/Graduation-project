@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+    <!--<script type="text/javascript" src="arcgisjs/jsapi_vsdoc12_v38.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+    <script>
+        dojo.require("esri.map");
+        var myMap, layer1;
+        function init() {
+
+            myMap = new esri.Map("map1", { logo: true });
+            layer1 = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/%E6%9E%97%E7%A7%91%E5%A4%A7/MapServer");
+            dojo.connect(layer1, "onLoad", function (layers) {
+                var html = "";
+                //获取图层信息
+                var infos = layers.layerInfos;
+               // alert(infos.length);
+                for (var i = 0; i < infos.length; i++) {
+                    var info = infos[i];
+                    html = html + "<div><input id='" + info.id + "' name='layerList' class='listCss' type='checkbox' value='checkbox' onclick='setLayerVisibility()' " + (info.defaultVisibility ? "checked" : "") + " />" + info.name + "</div>"
+                }
+                dojo.byId("toc").innerHTML = html;
+            });
+            myMap.addLayer(layer1);
+            myMap.setZoom(4);
+
+        }
+        function setLayerVisibility() {
+            //用dojo.query获取css为listCss的元素数组
+            //用dojo.query获取css为listCss的元素数组
+            var inputs = dojo.query(".listCss");
+            visible = [];
+            //对checkbox数组进行变量把选中的id添加到visible
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].checked) {
+                    visible.push(inputs[i].id);
+                } else {
+                    visible.push(-1);
+                }
+            }
+            //设置可视图层
+            layer1.setVisibleLayers(visible);
+        }
+        dojo.addOnLoad(init)
+    </script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td style=" width:800px;height:400px">
+                <div id="map1"
+                    data-dojo-type="dijit/layout/ContentPane"
+                    data-dojo-props="region:'center'"
+                    style="padding: 0">
+                </div>
+                <div id="div1"></div>
+                <div id="div2">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                </div>
+                
+            </td>
+            <td>
+                <div id="toc"></div>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

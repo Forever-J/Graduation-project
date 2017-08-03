@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+    <!--<script type="text/javascript" src="arcgisjs/jsapi_vsdoc12_v38.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+    <script>
+        dojo.require("esri.map");
+        dojo.require("esri.dijit.Scalebar");
+        dojo.require("esri.dijit.Bookmarks");
+        dojo.require("esri.dijit.BookmarkItem");
+        var myMap,Books;
+        function init() {
+            myMap = new esri.Map("map1");
+            var imageryPrime = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_Imagery_World_2D/MapServer");
+            myMap.addLayer(imageryPrime);
+            //var portlandLandBase = new esri.layers.ArcGISDynamicMapServiceLayer("http://jh-53a435fbc0e8/ArcGIS/rest/services/USA/MapServer");
+            ////设置要显示的图层
+            //portlandLandBase.setVisibleLayers([2, 1, 0]);
+            ////设置图层透明度
+            //portlandLandBase.setOpacity(0.8);
+            //myMap.addLayer(portlandLandBase);
+         
+
+
+            var div1 = dojo.byId("div1");
+            var div2 = dojo.byId("div2");
+            dojo.connect(myMap, "onMouseMove", function (e) {
+                var mp = e.mapPoint;
+                var sp = e.screenPoint;
+                div1.innerHTML = mp.x + "/" + sp.x;
+                div2.innerHTML = mp.y + "/" + sp.y;
+            });
+            var scalebar = new esri.dijit.Scalebar({
+                map: myMap,
+                // "dual" displays both miles and kilmometers
+                // "english" is the default, which displays miles
+                // use "metric" for kilometers
+                scalebarUnit: "dual"
+            }, dojo.byId("scalebardiv"));
+
+              Books = new esri.dijit.Bookmarks({
+                map: myMap,
+                editable: "true"
+            }, dojo.byId("bookmarks"));
+
+            dojo.connect(button1, "click", addBook);
+
+        }
+        function addBook() {
+
+            var bookextent = myMap.extent;
+
+            var bookmarkItem = new esri.dijit.BookmarkItem({
+                "extent": bookextent,
+                "name": "北京"
+            });
+            Books.addBookmark(bookmarkItem);
+        }
+        
+
+        dojo.addOnLoad(init)
+    </script>
+</head>
+<body><div id="scalebardiv"></div>
+    <div id="map1" style=" width:900px; height:500px"></div>
+    <div id="div1"></div>
+    <div id="div2"></div>
+    <table>
+        <tr>
+            <td><div id="bookmarks"></div></td>
+            <td></td>
+            <td><button id="button1">添加标签</button></td>
+        </tr>
+    </table>
+</body>
+</html>

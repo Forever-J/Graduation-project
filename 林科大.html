@@ -1,0 +1,428 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+    <link rel="stylesheet" href="dojo/dijit/themes/claro/claro.css" />
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #borderContainerTwo {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script>dojoConfig = { parseOnLoad: true }</script>
+    <script src='dojo/dojo/dojo.js'></script>
+
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        #borderContainerTwo {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script>
+        require(["dojo/parser", "dijit/layout/ContentPane", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/AccordionContainer", "dijit/layout/AccordionPane"]);
+</script>
+    <script>
+        var myMap, layer1,queryTask, query;
+        var symbol, infoTemplate, toolbar;
+        function setLayerVisibility() {
+            //用dojo.query获取css为listCss的元素数组
+            //用dojo.query获取css为listCss的元素数组
+            var inputs = dojo.query(".listCss");
+            visible = [];
+            //对checkbox数组进行变量把选中的id添加到visible
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].checked) {
+                    visible.push(inputs[i].id);
+                } else {
+                    visible.push(-1);
+                }
+            }
+            //设置可视图层
+            layer1.setVisibleLayers(visible);
+        }
+
+        function executeQueryTask(evt) {
+
+            query.geometry = evt.mapPoint;//根据点击地图的坐标
+
+
+            queryTask.execute(query, showResults);
+        }
+
+        function showResults(featureSet) {
+            myMap.graphics.clear();
+
+            dojo.forEach(featureSet.features, function (feature) {
+                var graphic = feature;
+                graphic.setSymbol(symbol);
+
+                graphic.setInfoTemplate(infoTemplate);
+
+                myMap.graphics.add(graphic);
+
+            });
+        }
+        dojo.require("esri.dijit.Scalebar");
+        dojo.require("esri.dijit.Bookmarks");
+        dojo.require("esri.dijit.BookmarkItem");
+        dojo.require("esri.toolbars.navigation");
+        dojo.require("esri.tasks.query");
+        require([
+            "esri/map",
+            "esri/dijit/OverviewMap",
+            "dojo/parser", "dijit/registry",
+            "dojo/dom",
+            "esri/Color",
+            "dojo/keys",
+            "esri/SnappingManager",
+            "esri/dijit/Measurement",
+            "esri/layers/FeatureLayer",
+            "esri/renderers/SimpleRenderer",
+            "esri/tasks/GeometryService",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/symbols/SimpleFillSymbol",
+            "dijit/TitlePane",
+            "dijit/form/CheckBox",
+            "dijit/layout/BorderContainer",
+            "dijit/layout/ContentPane",
+            "dijit/layout/TabContainer",
+            "dijit/layout/AccordionContainer",
+            "dijit/layout/AccordionPane",
+
+            "esri/toolbars/draw",
+            "esri/graphic",
+
+            "esri/symbols/SimpleMarkerSymbol",
+            
+            "dijit/form/Button", "dijit/WidgetSet",
+
+            
+            "dojo/domReady!"
+        ], function (
+            Map, OverviewMap,
+            parser, registry, dom, Color, keys, SnappingManager, Measurement, FeatureLayer, SimpleRenderer, GeometryService, SimpleLineSymbol, SimpleFillSymbol, TitlePane,CheckBox,BorderContainer, ContentPane, TabContainer, AccordionContainer, AccordionPane, Draw, graphic, SimpleMarkerSymbol, Button, WidgetSet
+        ) {
+                parser.parse();
+
+                myMap = new esri.Map("map1",{ logo: false });
+                
+                navToolbar = new esri.toolbars.Navigation(myMap);
+                layer1 = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/%E6%9E%97%E7%A7%91%E5%A4%A7/MapServer");
+                myMap.addLayer(layer1);
+                myMap.setZoom(4);
+
+                
+
+                dojo.connect(layer1, "onLoad", function (layers) {
+                    var html = "";
+                    //获取图层信息
+                    var infos = layers.layerInfos;
+                    // alert(infos.length);
+                    for (var i = 0; i < infos.length; i++) {
+                        var info = infos[i];
+                        html = html + "<div style='float:left;clear:both'><input id='" + info.id + "' name='layerList' class='listCss' type='checkbox' value='checkbox' onclick='setLayerVisibility()' " + (info.defaultVisibility ? "checked" : "") + " />" + info.name + "</div>"
+                    }
+                    dojo.byId("toc").innerHTML = html;
+                });
+                var scalebar = new esri.dijit.Scalebar({
+                    map: myMap,
+                    // "dual" displays both miles and kilmometers
+                    // "english" is the default, which displays miles
+                    // use "metric" for kilometers
+                    scalebarUnit: "dual"
+                }, dojo.byId("scalebardiv"));
+
+                var Books = new esri.dijit.Bookmarks({
+                    map: myMap,
+                    editable: "true"
+                }, dojo.byId("bookmarks"));
+                
+
+               
+                var div1 = dojo.byId("div1");
+                var div2 = dojo.byId("div2");
+                var button1 = dojo.byId("Button1");
+                var button2 = dojo.byId("Button2");
+                var button3 = dojo.byId("Button3");
+                var button4 = dojo.byId("Button4");
+                var button5 = dojo.byId("Button5");
+                var button6 = dojo.byId("Button6");
+                var button7 = dojo.byId("Button7");
+                var button8 = dojo.byId("Button8");
+                var button9 = dojo.byId("Button9");
+                dojo.connect(myMap, "onMouseMove", function (e) {
+                    var mp = e.mapPoint;
+                    var sp = e.screenPoint;
+                    div1.innerHTML = "地理坐标：" + mp.x + "/" + mp.y;
+                    div2.innerHTML = "桌面坐标：" + sp.x + "/" + sp.y;
+                });
+                dojo.connect(button1, "click", function (evt) {
+
+                    navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);
+
+                });
+                dojo.connect(button2, "click", function (evt) {
+
+                    navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);
+
+
+                });
+                dojo.connect(button3, "click", function (evt) {
+
+                    myMap.panUp();
+
+
+                });
+                dojo.connect(button4, "click", function (evt) {
+
+                    myMap.panDown();
+
+
+                });
+                dojo.connect(button5, "click", function (evt) {
+
+                    myMap.panLeft();
+
+
+                });
+                dojo.connect(button6, "click", function (evt) {
+
+                    myMap.panRight();
+
+
+                });
+                dojo.connect(button7, "click", function (evt) {
+
+                    navToolbar.zoomToFullExtent()
+                        ;
+
+
+                });
+                dojo.connect(button8, "click", function (evt) {
+
+                    navToolbar.activate(esri.toolbars.Navigation.PAN);
+
+
+
+                });
+                dojo.connect(button9, "click", function (evt) {
+
+                    var overviewMapDijit = new OverviewMap({
+                        map: myMap,
+                        visible: true
+                    });
+                    overviewMapDijit.startup();
+
+                });
+
+                myMap.on("load", initFunctionality);
+                function initFunctionality() {
+                    myMap.on("click", executeQueryTask);
+                    queryTask = new esri.tasks.QueryTask("http://localhost:6080/arcgis/rest/services/%E6%9E%97%E7%A7%91%E5%A4%A7/MapServer/4");
+                    query = new esri.tasks.Query();
+                    query.returnGeometry = true;
+                    query.outFields = ["OBJECTID", "SHAPE", "建筑名称", "SHAPE_Length", "SHAPE_Area"];
+                    infoTemplate = new esri.InfoTemplate("${OBJECTID}", "建筑名称: ${建筑名称}<br />SHAPE_Length: ${SHAPE_Length}<br />SHAPE_Area: ${SHAPE_Area}");
+
+                    symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOT, new dojo.Color([255, 0, 0]), 2), new dojo.Color([255, 255, 0, 0.5]));
+                }
+
+                var measurement = new Measurement({
+                    map: myMap
+                }, dom.byId("measurementDiv"));
+
+                measurement.startup();
+                measurement.on("measure-end", function (evt) {
+                    var evo = evt;
+                    alert(evt.target.result);
+                });
+
+
+                //myMap.on("load", createToolbar); //地图加载创建绘图工具对象
+
+                //// 遍历所有dijit,连接onClick事件
+                ////为按钮来激活绘图工具
+                //registry.forEach(function (d) {
+                //    //D是引用的dijit
+                //    //可能是一个布局容器或一个按钮
+                //    if (d.declaredClass === "dijit.form.Button") {//判断是不是按钮
+                //        d.on("click", activateTool);
+                //    }
+                //});
+
+                //function activateTool() {
+                //    var tool = this.label.toUpperCase().replace(" ", "_");//转换为大写
+                //    //  alert(tool);
+                //    toolbar.activate(Draw[tool]);//执行绘图
+                //    myMap.hideZoomSlider();
+                //}
+
+                //function createToolbar(themap) {
+                //    toolbar = new Draw(myMap);
+                //    toolbar.on("draw-end", addToMap);
+                //}
+
+                //function addToMap(evt) {
+                //    var symbol;
+                //    toolbar.deactivate();//试对象无效
+                //    myMap.showZoomSlider();//地图放大缩小标尺显示
+                //    switch (evt.geometry.type) {
+                //        case "point":
+                //        case "multipoint":
+                //            symbol = new SimpleMarkerSymbol();
+                //            break;
+                //        case "polyline":
+                //            symbol = new SimpleLineSymbol();
+                //            break;
+                //        default:
+                //            symbol = new SimpleFillSymbol();
+                //            break;
+                //    }
+                //    var graphic = new Graphic(evt.geometry, symbol);
+                //    myMap.graphics.add(graphic);
+                //}
+            });
+
+
+    </script>
+</head>
+<body class="claro">
+    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="gutters:true, liveSplitters:false" id="borderContainerTwo" style="margin: 0 auto;">
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top', splitter:false"
+            style="height: 80px">
+            <h1>中南林业科技大学校园地图（测试版）</h1>
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region:'left'"
+            style="width: 60px">
+            <table style="float: right">
+                <tr>
+                    <td>
+                        <input id="Button1" type="button" value="放大" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button2" type="button" value="缩小" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button3" type="button" value="上移" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button4" type="button" value="下移" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button5" type="button" value="左移" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button6" type="button" value="右移" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button7" type="button" value="全屏" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button8" type="button" value="拖动" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="Button9" type="button" value="鹰眼" /></td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="map1"
+            data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region:'center'"
+            style="padding: 0; width: 1500px">
+               <div style="position:absolute; right:10px; bottom:10px; z-Index:999;">
+          <div id="titlePane" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Measurement', closable:'false', open:'false'">
+            <div id="measurementDiv"></div>
+           
+          </div>
+        </div>
+        </div>
+
+        <div data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region:'right'"
+            style="width: 300px">
+           
+
+         <div data-dojo-type="dijit/layout/TabContainer" style="float: left; clear: both;height:300px ">
+            <div data-dojo-type="dijit/layout/ContentPane" title="图层" aria-selected="true">
+       <div id="toc"></div> 
+        </div>     
+        <div data-dojo-type="dijit/layout/ContentPane" title="标签" >
+        <div id="bookmarks"
+                style="float: left; clear: both">
+                  </div> 
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="查询">
+      查询
+        </div>       
+             <div id="header" data-dojo-type="dijit/layout/ContentPane"  title="绘图">
+            <span>绘图:<br /></span>
+      <button data-dojo-type="dijit/form/Button">Point</button>
+      <button data-dojo-type="dijit/form/Button">Multi Point</button>
+      <button data-dojo-type="dijit/form/Button">Line</button>
+      <button data-dojo-type="dijit/form/Button">Polyline</button>
+      <button data-dojo-type="dijit/form/Button">Polygon</button>
+      <button data-dojo-type="dijit/form/Button">Freehand Polyline</button>
+      <button data-dojo-type="dijit/form/Button">Freehand Polygon</button>
+      <!--The Arrow,Triangle,Circle and Ellipse types all draw with the polygon symbol-->
+      <button data-dojo-type="dijit/form/Button">Arrow</button>
+      <button data-dojo-type="dijit/form/Button">Triangle</button>
+      <button data-dojo-type="dijit/form/Button">Circle</button>
+      <button data-dojo-type="dijit/form/Button">Ellipse</button>
+        </div>
+
+        <div data-dojo-type="dijit/layout/ContentPane"  title="分析">
+      分析
+        </div>
+
+      <div data-dojo-type="dijit/layout/ContentPane"  title="编辑">
+      编辑
+        </div>
+
+    </div>
+        </div>
+
+
+
+        <div data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region:'bottom'" style="height: 50px">
+            <div id="scalebardiv" style="margin-right: 550px; float: right"></div>
+            <div id="div2" style="float: left; margin-left: 70px">
+                &nbsp;&nbsp;
+           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div id="div1" style="float: left; clear: both; margin-left: 70px"></div>
+        </div>
+
+    </div>
+    <!-- end BorderContainer -->
+</body>
+</html>

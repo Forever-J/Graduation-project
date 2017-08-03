@@ -1,0 +1,38 @@
+﻿<!DOCTYPE>
+<html>
+  <head>
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+     <title>My fisrt ArcGis Map</title>
+     <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css"/>
+   <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+     <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+     <script type="text/javascript">
+         dojo.require("esri.map");
+         var myMap;
+         function init() {
+             myMap = new esri.Map("arcgisDiv",{
+                 basemap: "streets",
+                 center: [-83.275, 42.573],
+                 zoom: 18
+             });
+             var myTiledMapServiceLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/%E6%9E%97%E7%A7%91%E5%A4%A7/MapServer");
+             myMap.addLayer(myTiledMapServiceLayer);
+             var div1 = dojo.byId("div1");
+             var div2 = dojo.byId("div2");
+             dojo.connect(myMap, "onMouseMove", function (e) {
+                 var mp = e.mapPoint;
+                 var sp = e.screenPoint;
+                 div1.innerHTML = mp.x + "/" + sp.x;
+                 div2.innerHTML = mp.y + "/" + sp.y;
+             });
+            
+         }
+         dojo.addOnLoad(init);
+     </script>
+  </head>
+  <body class="tundra">
+     <div id="arcgisDiv" style="width:900px; height:600px; border:1px solid #000;"></div>
+      <div id="div1"></div>
+      <div id="div2"></div>
+  </body>
+</html>

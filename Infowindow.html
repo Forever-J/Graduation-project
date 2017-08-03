@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Formatter Function</title>
+
+ <link rel="stylesheet" type="text/css" href="http://localhost:/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+    <script type="text/javascript" src="arcgisjs/jsapi_vsdoc12_v38.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+    <style>
+      html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+    </style>
+
+    <script>
+        // infotemplate formatting functions need to be in the global scope to work
+        var map, compare, compare2;
+
+        require([
+          "esri/map",
+          "esri/InfoTemplate",
+          "esri/layers/FeatureLayer",
+          "esri/renderers/SimpleRenderer",
+          "esri/symbols/SimpleFillSymbol",
+          "esri/symbols/SimpleLineSymbol",
+          "dojo/dom",
+          "dojo/number",
+          "dojo/on",
+          "dojo/parser",
+          "esri/Color",
+          "dijit/layout/BorderContainer",
+          "dijit/layout/ContentPane",
+          "dojox/layout/ExpandoPane",
+          "dojo/domReady!"
+        ],
+          function (
+            Map, InfoTemplate, FeatureLayer, SimpleRenderer, SimpleFillSymbol,
+            SimpleLineSymbol, dom, number, on, parser, Color
+        ) {
+
+              parser.parse();
+
+
+              map = new esri.Map("mapDiv");
+              var imageryPrime = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_Imagery_World_2D/MapServer");
+              map.addLayer(imageryPrime);
+              var infoTemplate = new InfoTemplate();
+              infoTemplate.setTitle("Population in ${NAME}");
+              infoTemplate.setContent("<b>2007 :D: </b>${POP2007:compare}<br/>" +
+                                      "<b>2007 density: </b>${POP07_SQMI:compare}<br/><br/>" +
+                                      "<b>2000: </b>${POP2000:NumberFormat}<br/>" +
+                                      "<b>2000 density: </b>${POP00_SQMI:NumberFormat}");
+
+              var counties = new FeatureLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3", {
+                  mode: FeatureLayer.MODE_SNAPSHOT,
+                  infoTemplate: infoTemplate,
+                  outFields: [
+                    "NAME", "POP2000", "POP2007", "POP00_SQMI",
+                    "POP07_SQMI"
+                  ]
+              });
+
+              //counties.setDefinitionExpression("STATE_NAME = 'Michigan'");
+
+              //apply a renderer
+              var symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+                new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                  new Color([255, 255, 255, 0.35]), 1),
+                new Color([109, 146, 155, 0.35]));
+              counties.setRenderer(new SimpleRenderer(symbol));
+
+              map.addLayer(counties);
+
+            
+          });
+    </script>
+  </head>
+  <body class="soria">
+    <div data-dojo-type="dijit/layout/BorderContainer"
+         data-dojo-props="design:'headline', gutters:true" 
+         style="width: 100%; height: 100%; margin: 0;">
+
+      <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
+    </div>
+  </body>
+
+</html>

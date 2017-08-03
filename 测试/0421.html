@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:3616/arcgisjs/init.js"></script>
+    <script type="text/javascript" src="http://localhost:3616/arcgisjs/jsapi_vsdoc12_v38.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/esri/css/esri.css" />
+    <style>
+      html, body, #map {
+        height: 100%; width: 100%; margin: 0; padding: 0; 
+      }
+      #controls {
+        background: #fff;
+        box-shadow: 0 6px 6px -6px #999;
+        color: #444;
+        font-family: sans-serif;
+        height: auto;
+        left: 1em;
+        padding: 1em;
+        position: absolute;
+        top: 1em;
+        width: auto;
+        z-index: 40;
+      }
+      #controls div {
+        padding: 0 0 1em 0;
+      }
+    </style>
+
+  
+    <script>
+        var map;
+
+        require([
+          "esri/map", "esri/geometry/Circle", "esri/symbols/SimpleFillSymbol",
+          "esri/graphic", "esri/layers/GraphicsLayer",
+          "dojo/dom", "dojo/dom-attr", "dojo/domReady!"
+        ], function (
+          Map, Circle, SimpleFillSymbol,
+          Graphic, GraphicsLayer,
+          dom, domAttr
+        ) {
+            map = new Map("map", {
+                basemap: "streets",
+                center: [-120.741, 56.39],
+                slider: false,
+                zoom: 6
+            });
+            var symbol = new SimpleFillSymbol().setColor(null).outline.setColor("blue");
+            var gl = new GraphicsLayer({ id: "circles" });
+            map.addLayer(gl);
+            map.on("click", function (e) {
+                var radius = map.extent.getWidth() / 10;
+                var circle = new Circle({
+                    center: e.mapPoint,//中心点
+                    radius: radius//半径
+                });
+                var graphic = new Graphic(circle, symbol);
+                gl.add(graphic);
+            });
+        });
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+   
+  </body>
+</html> 

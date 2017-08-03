@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>The CheckBox Tree with custom Icons</title>
+     <style type="text/css">
+      @import "arcgisjs/js/dojo/dijit/themes/claro/claro.css";
+      @import "arcgisjs/js/dojo/dijit/themes/claro/document.css";
+      @import "arcgisjs/js/dojo/dijit/tests/css/dijitTests.css";
+      @import "arcgisjs/js/dojo/cbtree/themes/claro/claro.css";
+      @import "arcgisjs/js/dojo/cbtree/icons/networkIcons.css";
+    </style>
+
+    <script type="text/javascript">
+        var dojoConfig = {
+            async: true,
+            parseOnLoad: true,
+            isDebug: false,
+            baseUrl: "arcgisjs/js/dojo",
+            locale: 'en-us',
+            packages: [
+              { name: "dojo", location: "dojo" },
+              { name: "dijit", location: "dijit" },
+              { name: "cbtree", location: "cbtree" }
+            ]
+        };
+    </script>
+
+    <script type="text/javascript" src="arcgisjs/js/dojo/dojo/dojo.js"></script>
+    <script type="text/javascript">
+        require([
+          "dojo/data/ItemFileWriteStore",
+          "dojo/ready",
+          "cbtree/Tree",                    // Checkbox Tree
+          "cbtree/extensions/TreeStyling",  // Tree styling extensions
+          "cbtree/models/ForestStoreModel"  // Forest Store Model
+        ], function (ItemFileWriteStore, ready, Tree, TreeStyling, ForestStoreModel) {
+            var data = {
+                "identifier": "name",
+                "label": "name",
+                "items": [
+                   {
+                       "name": "Africa", "type": "continent", "children": [
+                       { "name": "Egypt", "type": "country" },
+                       {
+                           "name": "Kenya", "type": "country", "children": [
+                           { "name": "Nairobi", "type": "city" },
+                           { "name": "Mombasa", "type": "city" }]
+                       },
+                       {
+                           "name": "Sudan", "type": "country", "children":
+                           { "name": "Khartoum", "type": "city" }
+                       }]
+                   },
+                   {
+                       "name": "Asia", "type": "continent", "children": [
+                       { "name": "China", "type": "country" },
+                       { "name": "India", "type": "country" },
+                       { "name": "Russia", "type": "country" },
+                       { "name": "Mongolia", "type": "country" }]
+                   },
+                   {
+                       "name": "Australia", "type": "continent", "children":
+                       { "name": "Commonwealth of Australia", "type": "country" }
+                   },
+                   {
+                       "name": "Europe", "type": "continent", "children": [
+                       { "name": "Germany", "type": "country" },
+                       { "name": "France", "type": "country" },
+                       { "name": "Spain", "type": "country" },
+                       { "name": "Italy", "type": "country" }]
+                   },
+                   {
+                       "name": "North America", "type": "continent", "children": [
+                       {
+                           "name": "Mexico", "type": "country", "children": [
+                           { "name": "Mexico City", "type": "city" },
+                           { "name": "Guadalajara", "type": "city" }]
+                       },
+                       {
+                           "name": "Canada", "type": "country", "children": [
+                           { "name": "Ottawa", "type": "city" },
+                           { "name": "Toronto", "type": "city" }]
+                       },
+                       { "name": "United States of America", "type": "country" }]
+                   },
+                   {
+                       "name": "South America", "type": "continent", "children": [
+                       { "name": "Brazil", "type": "country" },
+                       { "name": "Argentina", "type": "country" }]
+                   }
+                ]
+            };
+          
+            var store = new ItemFileWriteStore({ data: data });
+            var model = new ForestStoreModel({
+                store: store,
+                query: { type: "country" },
+                rootLabel: "The Earth",
+                    checkedAll: true,
+                    checkedRoot: true
+            });
+
+            ready(function () {
+                var tree = new Tree({
+                    model: model,
+                    id: "MenuTree",
+                    checkboxMultiState: true,
+                    icon: { iconClass: "networkIcon", indent: true },
+                    branchIcons: true,
+                    nodeIcons: true
+                }, "CheckboxTree");
+                tree.startup();
+                tree.connect(tree, 'onClick', clickTreeNode);    
+                function clickTreeNode(item/*点中节点对应的数据项*/, node/*点中的对象，这里node.item就是的第一个参数*/,evt/*事件*/)    
+                {    
+                    alert(item.name);
+                }    
+            });
+        });
+    </script>
+  </head>
+
+  <body class="claro">
+    <h1 class="DemoTitle">The CheckBox Tree with Custom Icons</h1>
+    <p>
+      Demonstrate the tree styling API with custom icons.
+    </p>
+    <div id="CheckboxTree">
+    </div>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+    <script type="text/javascript" src="http://localhost:57835/arcgisjs/jsapi_vsdoc12_v38.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+    <script>
+        dojo.require("esri.map");
+        dojo.require("esri.toolbars.navigation");//引入导航组件
+        dojo.require("esri.toolbars.draw");
+        dojo.require("dijit.registry");
+        var myMap;
+        function init() {
+            myMap = new esri.Map("map1", { logo: true });
+            var layer1 = new esri.layers.ArcGISTiledMapServiceLayer("http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer");
+            myMap.addLayer(layer1);
+            myMap.setZoom(4);
+            myMap.disableKeyboardNavigation();
+            var div1 = dojo.byId("div1");
+            var div2 = dojo.byId("div2");
+            dojo.connect(myMap, "onMouseMove", function (e) {
+                var mp = e.mapPoint;
+                var sp = e.screenPoint;
+                div1.innerHTML = mp.x + "/" + sp.x;
+                div2.innerHTML = mp.y + "/" + sp.y;
+            });
+            var navToolbar = new esri.toolbars.Navigation(myMap);//导航对象
+            var zoomprev = dojo.byId("zoomprev");
+            var zoomnext = dojo.byId("zoomnext");
+            dojo.connect(zoomprev, "click", function (ex) {
+
+                navToolbar.zoomToPrevExtent();
+            })
+            dojo.connect(zoomnext, "click", function (ex) {
+
+                navToolbar.zoomToNextExtent();
+            })
+         
+    
+            
+        }
+
+        dojo.addOnLoad(init)
+    </script>
+</head>
+<body>
+    <div id="map1" style=" width:900px; height:500px"></div>
+    <div id="div1"></div>
+    <div id="div2"></div>
+    <div id="div3"><button id="zoomprev">上一视图</button><button id="zoomnext">下一视图</button></div>
+</body>
+</html>

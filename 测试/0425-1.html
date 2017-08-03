@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Shapes and Symbols</title>
+
+     <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:3616/arcgisjs/init.js"></script>
+    <!--<script type="text/javascript" src="http://localhost:3616/arcgisjs/jsapi_vsdoc12_v38.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/esri/css/esri.css" />
+
+    <style>
+      #info {
+        top: 20px;
+        color: #444;
+        height: auto;
+        font-family: arial;
+        right: 20px;
+        margin: 5px;
+        padding: 10px;
+        position: absolute;
+        width: 115px;
+        z-index: 40;
+        border: solid 2px #666;
+        border-radius: 4px;
+        background-color: #fff;
+      }
+      html, body, #mapDiv {
+        padding:0;
+        margin:0;
+        height:100%;
+      }
+      button {
+        display: block;
+      }
+    </style>
+
+
+    <script>
+        var map, tb;
+
+        require([
+          "esri/map", "esri/toolbars/draw",
+          "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol",
+          "esri/symbols/PictureFillSymbol", "esri/symbols/CartographicLineSymbol",
+          "esri/graphic",
+          "esri/Color", "dojo/dom", "dojo/on", "dojo/domReady!"
+        ], function (
+          Map, Draw,
+          SimpleMarkerSymbol, SimpleLineSymbol,
+          PictureFillSymbol, CartographicLineSymbol,
+          Graphic,
+          Color, dom, on
+        ) {
+            map = new Map("mapDiv", {
+                basemap: "streets",
+                center: [-25.312, 34.307],
+                zoom: 3
+            });
+            map.on("load", initToolbar);
+
+         
+            var markerSymbol = new SimpleMarkerSymbol();
+           
+            markerSymbol.setColor(new Color("#00FFFF"));
+
+            // 用于徒手画的多段线、多线和线。
+            var lineSymbol = new CartographicLineSymbol( //用来绘制图形层上线符号，,像simplelinesymbol，效果更立体
+              CartographicLineSymbol.STYLE_SOLID,//样式，颜色，宽度
+              new Color([255, 0, 0]), 10,
+              CartographicLineSymbol.CAP_ROUND,//线是圆的，只是超出了终点。
+              CartographicLineSymbol.JOIN_MITER, 5   //连接线不是圆形或斜，加入衔接线的尺寸
+            );
+
+
+            var fillSymbol = new PictureFillSymbol(
+              "images/mangrove.png",
+              new SimpleLineSymbol(
+                SimpleLineSymbol.STYLE_SOLID,
+                new Color('#000'),
+                1
+              ),
+              42,
+              42
+            );
+
+            function initToolbar() {
+                tb = new Draw(map);
+                tb.on("draw-end", addGraphic);//画完之后执行
+
+              
+                // 需要为每个单独的按钮绑定事件
+                on(dom.byId("info"), "click", function (evt) {
+                    if (evt.target.id === "info") {
+                        return;
+                    }
+                    var tool = evt.target.id.toLowerCase();
+                    map.disableMapNavigation();
+                    tb.activate(tool);//开始画图
+                });
+            }
+
+            function addGraphic(evt) {
+                //关闭工具栏和明确现有的图形
+                tb.deactivate();
+                map.enableMapNavigation();
+
+                // 找出哪些符号使用
+                var symbol;
+                if (evt.geometry.type === "point" || evt.geometry.type === "multipoint") {
+                    symbol = markerSymbol;
+                } else if (evt.geometry.type === "line" || evt.geometry.type === "polyline") {
+                    symbol = lineSymbol;
+                }
+                else {
+                    symbol = fillSymbol;
+                }
+
+                map.graphics.add(new Graphic(evt.geometry, symbol));
+            }
+        });
+    </script>
+  </head>
+  
+  <body>
+    
+    <div id="info">
+      <div></div>
+      <button id="Point">画点</button>
+      <button id="Multipoint">多点</button>
+      <button id="Line">线</button>
+      <button id="Polyline">多段线</button>
+      <button id="FreehandPolyline">徒手画线</button>
+      <button id="Triangle">三角形</button>
+      <button id="Extent">正方形</button>
+      <button id="Circle">圆</button>
+      <button id="Ellipse">椭圆</button>
+      <button id="Polygon">面</button>
+      <button id="FreehandPolygon">徒手画的多边形</button>
+    </div>
+
+    <div id="mapDiv"></div>
+
+  </body>
+</html>

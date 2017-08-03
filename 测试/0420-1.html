@@ -1,0 +1,26 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+     <title>My fisrt ArcGis Map</title>
+     <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css"/>
+   <script type="text/javascript" src="http://localhost:3616/arcgisjs/init.js"></script>
+     <link rel="stylesheet" type="text/css" href="http://localhost:3616/arcgisjs/js/esri/css/esri.css" />
+     <script type="text/javascript">
+         dojo.require("esri.map");
+         var myMap;
+         function init() {
+             myMap = new esri.Map("arcgisDiv");
+             var myTiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://localhost:6080/arcgis/rest/services/sd/MapServer");
+             myMap.addLayer(myTiledMapServiceLayer);
+             myMap.setZoom(4);
+            
+         }
+         dojo.addOnLoad(init);
+     </script>
+  </head>
+  <body class="tundra">
+     <div id="arcgisDiv" style="width:900px; height:600px; border:1px solid #000;"></div>
+ 
+  </body>
+</html>

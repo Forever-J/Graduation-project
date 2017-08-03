@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/dojo/dijit/themes/tundra/tundra.css" />
+    <script type="text/javascript" src="http://localhost:57835/arcgisjs/init.js"></script>
+    <!--<script type="text/javascript" src="arcgisjs/jsapi_vsdoc12_v38.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="http://localhost:57835/arcgisjs/js/esri/css/esri.css" />
+	<style type="text/css">
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow:hidden;
+}
+
+#borderContainerTwo {
+    width: 100%;
+    height: 100%;
+}
+	</style>
+	<script>dojoConfig = { parseOnLoad: true }</script>
+	<script src='dojo/dojo/dojo.js'></script>
+	
+	<script>
+        require(["dojo/parser", "dijit/layout/ContentPane", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/AccordionContainer", "dijit/layout/AccordionPane"]);
+	</script>
+    <script>
+        dojo.require("esri.map");
+        dojo.require("esri.dijit.OverviewMap");
+        dojo.require("esri.toolbars.navigation");
+        var myMap;
+        function init() {
+            myMap = new esri.Map("map1", { logo: true });
+            navToolbar = new esri.toolbars.Navigation(myMap);
+            var layer1 = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/%E6%9E%97%E7%A7%91%E5%A4%A7/MapServer");
+            dojo.connect(layer1, "onLoad", function (layers) {
+                var html = "";
+                //获取图层信息
+                var infos = layers.layerInfos;
+                // alert(infos.length);
+                for (var i = 0; i < infos.length; i++) {
+                    var info = infos[i];
+                    html = html + "<div><input id='" + info.id + "' name='layerList' class='listCss' type='checkbox' value='checkbox' onclick='setLayerVisibility()' " + (info.defaultVisibility ? "checked" : "") + " />" + info.name + "</div>"
+                }
+                dojo.byId("toc").innerHTML = html;
+            });
+            myMap.addLayer(layer1);
+            myMap.setZoom(4);
+            var div1 = dojo.byId("div1");
+            var div2 = dojo.byId("div2");
+            var button1 = dojo.byId("Button1");
+            var button2 = dojo.byId("Button2");
+            var button3 = dojo.byId("Button3");
+            var button4 = dojo.byId("Button4");
+            var button5 = dojo.byId("Button5");
+            var button6 = dojo.byId("Button6");
+            var button7 = dojo.byId("Button7");
+            var button8 = dojo.byId("Button8");
+            var button9 = dojo.byId("Button9");
+            dojo.connect(myMap, "onMouseMove", function (e) {
+                var mp = e.mapPoint;
+                var sp = e.screenPoint;
+                div1.innerHTML = mp.x + "/" + sp.x;
+                div2.innerHTML = mp.y + "/" + sp.y;
+                
+            });
+            dojo.connect(button1, "click", function (evt) {
+
+                navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);
+
+            });
+            dojo.connect(button2, "click", function (evt) {
+
+                navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);
+
+
+            });
+            dojo.connect(button3, "click", function (evt) {
+
+                myMap.panUp();
+
+
+            });
+            dojo.connect(button4, "click", function (evt) {
+
+                myMap.panDown();
+
+
+            });
+            dojo.connect(button5, "click", function (evt) {
+
+                myMap.panLeft();
+
+
+            });
+            dojo.connect(button6, "click", function (evt) {
+
+                myMap.panRight();
+
+
+            });
+            dojo.connect(button7, "click", function (evt) {
+
+                navToolbar.zoomToFullExtent()
+                ;
+
+
+            });
+            dojo.connect(button8, "click", function (evt) {
+
+                navToolbar.activate(esri.toolbars.Navigation.PAN);
+
+
+
+            });
+
+
+
+            dojo.connect(button9, "click", function (evt) {
+
+                var overviewMap = new esri.dijit.OverviewMap({
+                    map: myMap,
+                    visible: true
+                });
+                overviewMap.startup();
+
+
+            });
+        }
+        function setLayerVisibility() {
+            //用dojo.query获取css为listCss的元素数组
+            //用dojo.query获取css为listCss的元素数组
+            var inputs = dojo.query(".listCss");
+            visible = [];
+            //对checkbox数组进行变量把选中的id添加到visible
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].checked) {
+                    visible.push(inputs[i].id);
+                } else {
+                    visible.push(-1);
+                }
+            }
+            //设置可视图层
+            layer1.setVisibleLayers(visible);
+        }
+        dojo.addOnLoad(init)
+    </script>
+</head>
+<body>
+    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="gutters:true, liveSplitters:false" id="borderContainerTwo"style="margin:0 auto;">
+     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top', splitter:false"
+         style="height:50px">
+      头部
+    </div>
+        <div  data-dojo-type="dijit/layout/ContentPane" 
+           data-dojo-props="region:'left'" 
+            style="width:100px">
+        <table style="float:right">
+            <tr><td><input id="Button1" type="button" value="放大" /></td></tr>
+            <tr><td><input id="Button2" type="button" value="缩小" /></td></tr>
+            <tr><td><input id="Button3" type="button" value="上移" /></td></tr>
+            <tr><td><input id="Button4" type="button" value="下移" /></td></tr>
+            <tr><td><input id="Button5" type="button" value="左移" /></td></tr>
+            <tr><td><input id="Button6" type="button" value="右移" /></td></tr>
+            <tr><td><input id="Button7" type="button" value="全屏" /></td></tr>
+            <tr><td><input id="Button8" type="button" value="拖动" /></td></tr>
+            <tr><td><input id="Button9" type="button" value="鹰眼" /></td></tr>
+          </table> 
+        </div>
+
+     <div id="map1" 
+           data-dojo-type="dijit/layout/ContentPane" 
+           data-dojo-props="region:'center'" 
+           style="padding:0;border:1px solid #000;width:1000px">
+      </div>
+    
+        <div id="toc"
+            data-dojo-type="dijit/layout/ContentPane" 
+           data-dojo-props="region:'right'"style="width:100px" ></div>
+
+        <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'right',tabStrip:true" style="width:400px">
+        <div data-dojo-type="dijit/layout/ContentPane" title="绘图查询" selected="true">
+       
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="属性查询">
+      
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="closable:true" title="数据">
+      
+        </div>
+    </div>
+
+      <div data-dojo-type="dijit/layout/ContentPane" 
+           data-dojo-props="region:'bottom'" style="height: 50px">
+        <div id="div2"
+          ">
+        &nbsp;&nbsp;
+           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+        <div id="div1"></div>
+      </div>
+
+     </div><!-- end BorderContainer -->   
+</body>
+</html>
